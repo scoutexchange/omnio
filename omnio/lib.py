@@ -11,8 +11,6 @@ _scheme_opens = {
     'http': http.open_,
     'https': http.open_,
     's3': s3.open_,
-    's3n': s3.open_,
-    's3u': s3.open_,
 }
 
 
