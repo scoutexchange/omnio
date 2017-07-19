@@ -42,3 +42,7 @@ def test_invalid_combination():
     # can't specify encoding in binary mode
     with pytest.raises(ValueError):
         omnio.open('tests/data/test_open_file_r.txt', 'rb', encoding='utf-8')
+
+    # can't have both text and binary
+    with pytest.raises(ValueError):
+        omnio.open('tests/data/test_open_file_r.txt', 'rbt')

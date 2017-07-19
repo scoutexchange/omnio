@@ -25,6 +25,10 @@ def open_(uri, mode='r', buffering=-1, encoding=None, newline=None,
         msg = 'must have exactly one of create/read/write/append mode'
         raise ValueError(msg)
 
+    if 'b' in mode and 't' in mode:
+        msg = "can't have text and binary mode at once"
+        raise ValueError(msg)
+
     if 'b' in mode and encoding is not None:
         msg = "binary mode doesn't take an encoding argument"
         raise ValueError(msg)
