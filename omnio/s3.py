@@ -1,4 +1,3 @@
-import locale
 import urllib
 
 import boto3
@@ -9,11 +8,10 @@ UPLOAD_PART_SIZE = 5 * 1024**2
 
 
 class Writer:
-    def __init__(self, s3, bucket, key, encoding):
+    def __init__(self, s3, bucket, key):
         self.s3 = s3
         self.bucket = bucket
         self.key = key
-        self.encoding = encoding
         self.buffer = bytearray()
         self.multipart = None
         self.parts = []
@@ -64,14 +62,23 @@ class Writer:
                                           UploadId=self.multipart['UploadId'],
                                           MultipartUpload=part_info)
 
+    def flush(self):  # pragma: no cover
+        pass
+
+    def readable(self):  # pragma: no cover
+        return False
+
+    def seekable(self):  # pragma: no cover
+        return False
+
+    def writable(self):  # pragma: no cover
+        return True
+
     def seek(self, offset, whence=None):  # pragma: no cover
         raise NotImplementedError()
 
     def write(self, data):
         self._ensure_open()
-
-        if self.encoding:
-            data = data.encode(self.encoding)
 
         self.buffer.extend(data)
 
@@ -83,21 +90,25 @@ class Writer:
             self._upload_part()
 
 
-def open_(uri, mode, encoding):  # pragma: no cover
+def open_(uri, mode):  # pragma: no cover
     parsed_uri = urllib.parse.urlparse(uri)
     bucket = parsed_uri.netloc
     key = parsed_uri.path.lstrip('/')
 
     s3 = boto3.client('s3')
 
-    if 'b' not in mode and encoding is None:
-        encoding = locale.getpreferredencoding(do_setlocale=False)
+    if 'x' in mode:
+        msg = "s3 scheme doesn't support 'x' mode"
+        raise ValueError(msg)
+
+    if 'a' in mode:
+        raise NotImplementedError()
 
     if 'r' in mode:
         resp = s3.get_object(Bucket=bucket, Key=key)
         stream = resp['Body']
 
-        return io.Reader(stream, encoding)
+        return io.Reader(stream)
 
     if 'w' in mode:
-        return Writer(s3, bucket, key, encoding)
+        return Writer(s3, bucket, key)

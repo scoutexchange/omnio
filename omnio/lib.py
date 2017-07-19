@@ -1,3 +1,4 @@
+import io
 import urllib
 
 from omnio import http, s3
@@ -47,4 +48,13 @@ def open_(uri, mode='r', buffering=-1, encoding=None, newline=None,
 
     parsed_uri = urllib.parse.urlparse(uri)
     scheme_open = _scheme_opens[parsed_uri.scheme]
-    return scheme_open(uri, mode, encoding=encoding)
+
+    # always open the underlying "file" in binary mode
+    fd_mode = ''.join(set(mode.replace('t', '') + 'b'))
+    fd = scheme_open(uri, fd_mode)
+
+    # if binary isn't specified default to a text wrapper
+    if 'b' not in mode:
+        fd = io.TextIOWrapper(fd, encoding=encoding)
+
+    return fd

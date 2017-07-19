@@ -115,12 +115,15 @@ def test_iter():
     responses.add(responses.GET, uri, body=data, status=200,
                   content_type='text/plain; charset=UTF-8')
 
-    with omnio.open(uri, 'rt') as infile:
+    expect_first = 'Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν, ὦ ἄνδρες ' \
+        '᾿Αθηναῖοι,\n'.encode('utf-8')
+    expect_last = 'τελευτῆς ὁντινοῦν ποιεῖσθαι λόγον.'.encode('utf-8')
+
+    with omnio.open(uri, 'rb') as infile:
         lines = list(infile)
         assert len(lines) == 16
-        assert lines[0] == \
-            'Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν, ὦ ἄνδρες ᾿Αθηναῖοι,\n'
-        assert lines[-1] == 'τελευτῆς ὁντινοῦν ποιεῖσθαι λόγον.'
+        assert lines[0] == expect_first
+        assert lines[-1] == expect_last
 
 
 @responses.activate
@@ -134,8 +137,6 @@ def test_closed():
     # none of these operations are allowed on a closed file
     with pytest.raises(ValueError):
         f.read()
-    with pytest.raises(ValueError):
-        f.readlines()
     with pytest.raises(ValueError):
         next(f)
     with pytest.raises(ValueError):

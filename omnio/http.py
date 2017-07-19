@@ -1,16 +1,12 @@
-from io import BytesIO, StringIO
-import os
-
 import requests
 
 
 class Reader:
-    def __init__(self, resp, decode_unicode):
-        self.decode_unicode = decode_unicode
+    def __init__(self, resp):
         self.content_iter = resp.iter_content(chunk_size=512,
-                                              decode_unicode=decode_unicode)
+                                              decode_unicode=False)
         self.line_iter = _iter_lines(self.content_iter)
-        self.buffer = _make_buffer(decode_unicode)
+        self.buffer = bytearray()
         self.closed = False
 
     def __enter__(self):
@@ -37,12 +33,14 @@ class Reader:
     def close(self):
         self.closed = True
 
+    def flush(self):
+        pass
+
     def read(self, size=None):
         self._ensure_open()
 
         while True:
-            self.buffer.seek(0, os.SEEK_END)
-            if size is not None and self.buffer.tell() >= size:
+            if size is not None and len(self.buffer) >= size:
                 break
 
             try:
@@ -50,24 +48,24 @@ class Reader:
             except StopIteration:
                 break
             else:
-                self.buffer.write(chunk)
+                self.buffer.extend(chunk)
 
-        self.buffer.seek(0)
-        data = self.buffer.read(size)
-        pending = self.buffer.read()
-        self.buffer = _make_buffer(self.decode_unicode, pending)
+        data = self.buffer[:size]
+        self.buffer = self.buffer[size:]
 
         return data
 
-    def readlines(self):
-        return list(self)
+    def readable(self):
+        return True
+
+    def seekable(self):
+        return False
+
+    def writable(self):
+        return False
 
     def seek(self, offset, whence=0):  # pragma: no cover
         raise NotImplementedError()
-
-
-def _make_buffer(decode_unicode, data=None):
-    return StringIO(data) if decode_unicode else BytesIO(data)
 
 
 def _iter_lines(content_iter):
@@ -91,19 +89,15 @@ def _iter_lines(content_iter):
         yield pending
 
 
-def open_(uri, mode, encoding):  # pragma: no cover
+def open_(uri, mode):  # pragma: no cover
 
-    # http.Reader relies on the Content-Type header for the encoding.
-    # It's possible we could support this in the future as an
-    # override or a fallback.
-    if encoding is not None:
-        msg = "http scheme doesn't support encoding argument"
+    if 'x' in mode:
+        msg = "http scheme doesn't support 'x' mode"
         raise ValueError(msg)
 
     if 'r' in mode:
         resp = requests.get(uri, stream=True)
-        decode_unicode = 'b' not in mode
-        return Reader(resp, decode_unicode)
+        return Reader(resp)
 
     if 'w' in mode:
         raise NotImplementedError()

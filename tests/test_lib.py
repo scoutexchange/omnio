@@ -7,26 +7,21 @@ import omnio
 
 def test_open_file_r():
     with omnio.open('tests/data/test_open_file_r.txt', 'r') as fd:
-        assert fd.readlines() == ['one\n', 'two\n', 'three\n']
+        assert fd.read() == 'one\ntwo\nthree\n'
 
 
 def test_open_file_w():
     path = 'tests/data/test_open_file_w.txt'
     try:
-        with omnio.open(path, 'w') as fd:
+        with omnio.open(path, 'wt') as fd:
             fd.write('one\ntwo\nthree\n')
     except:
         raise
     else:
         with open(path, 'r') as fd:
-            assert fd.readlines() == ['one\n', 'two\n', 'three\n']
+            assert list(fd) == ['one\n', 'two\n', 'three\n']
     finally:
         os.remove(path)
-
-
-def test_open_s3_r():
-    with omnio.open('tests/data/test_open_file_r.txt', 'r') as fd:
-        assert fd.readlines() == ['one\n', 'two\n', 'three\n']
 
 
 def test_invalid_mode():

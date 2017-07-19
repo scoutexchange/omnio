@@ -1,7 +1,6 @@
 class Reader:
-    def __init__(self, stream, encoding):
+    def __init__(self, stream):
         self.stream = stream
-        self.encoding = encoding
         self.line_iter = _iter_lines(self, chunk_size=512)
         self.closed = False
 
@@ -29,16 +28,23 @@ class Reader:
     def close(self):
         self.closed = True
 
+    def flush(self):  # pragma: no cover
+        pass
+
+    def readable(self):  # pragma: no cover
+        return True
+
+    def seekable(self):  # pragma: no cover
+        return False
+
+    def writable(self):  # pragma: no cover
+        return False
+
     def read(self, size=None):
         self._ensure_open()
 
         data = self.stream.read(size)
-        if self.encoding:
-            data = data.decode(self.encoding)
         return data
-
-    def readlines(self):
-        return list(self)
 
     def seek(self, offset, whence=0):  # pragma: no cover
         raise NotImplementedError()
