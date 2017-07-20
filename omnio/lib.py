@@ -1,3 +1,4 @@
+import bz2
 import gzip
 import io
 import urllib
@@ -24,10 +25,20 @@ class GzipFileWrapper(gzip.GzipFile):
         self._fileobj.close()
 
 
+class BZ2FileWrapper(bz2.BZ2File):
+    def __init__(self, fd, mode):
+        self._fileobj = fd
+        super(BZ2FileWrapper, self).__init__(fd, mode=mode)
+
+    def close(self):
+        super(BZ2FileWrapper, self).close()
+        self._fileobj.close()
+
+
 def open_(uri, mode='rb', buffering=-1, encoding=None, newline=None,
           closefd=None, opener=None):
 
-    if not all(c in 'rwxatb+z' for c in mode):
+    if not all(c in 'rwxatb+jz' for c in mode):
         msg = 'invalid mode: {}'.format(mode)
         raise ValueError(msg)
 
@@ -41,6 +52,10 @@ def open_(uri, mode='rb', buffering=-1, encoding=None, newline=None,
 
     if 'b' in mode and encoding is not None:
         msg = "binary mode doesn't take an encoding argument"
+        raise ValueError(msg)
+
+    if 'j' in mode and 'z' in mode:
+        msg = "can't use more than one compression argument"
         raise ValueError(msg)
 
     # We want to support the standard python file open interface,
@@ -58,13 +73,19 @@ def open_(uri, mode='rb', buffering=-1, encoding=None, newline=None,
     parsed_uri = urllib.parse.urlparse(uri)
     scheme_open = _scheme_opens[parsed_uri.scheme]
 
-    # Text encoding and gzip compression are handled with wrapper
+    # Text encoding and compression are handled with wrapper
     # classes. We always do the underlying open in binary mode.
-    fd_mode = mode.replace('t', '').replace('b', '').replace('z', '')
-    fd = scheme_open(uri, fd_mode + 'b')
+    rw_mode = mode
+    for s in 'tbjz':
+        rw_mode = rw_mode.replace(s, '')
+
+    fd = scheme_open(uri, rw_mode + 'b')
+
+    if 'j' in mode:
+        fd = BZ2FileWrapper(fd, rw_mode)
 
     if 'z' in mode:
-        fd = GzipFileWrapper(fd, fd_mode)
+        fd = GzipFileWrapper(fd, rw_mode)
 
     if 't' in mode:
         fd = io.TextIOWrapper(fd, encoding=encoding)

@@ -1,3 +1,4 @@
+import bz2
 import csv
 import gzip
 import os
@@ -29,6 +30,13 @@ def test_open_file_rbz():
         assert len(data) == 5535530  # uncompressed file size
 
 
+def test_open_file_rbj():
+    with omnio.open('tests/data/flights-3m.csv.bz2', 'rbj') as fd:
+        data = fd.read()
+        assert type(data) is bytes
+        assert len(data) == 5535530  # uncompressed file size
+
+
 def test_open_file_w():
     path = 'tests/data/test_open_file_w.txt'
     try:
@@ -54,6 +62,22 @@ def test_open_file_wbz():
     else:
         with open(path, 'rb') as fd:
             with gzip.open(fd) as gz:
+                assert gz.read() == data
+    finally:
+        os.remove(path)
+
+
+def test_open_file_wbj():
+    path = 'tests/data/test_open_file_wbj.txt.gz'
+    data = os.urandom(1024)
+    try:
+        with omnio.open(path, 'wbj') as fd:
+            fd.write(data)
+    except:
+        raise
+    else:
+        with open(path, 'rb') as fd:
+            with bz2.open(fd) as gz:
                 assert gz.read() == data
     finally:
         os.remove(path)
@@ -92,3 +116,7 @@ def test_invalid_combination():
     # can't have both text and binary
     with pytest.raises(ValueError):
         omnio.open('tests/data/test_open_file_r.txt', 'rbt')
+
+    # only one compression type allowed
+    with pytest.raises(ValueError):
+        omnio.open('tests/data/test_open_file_r.txt', 'rjz')
