@@ -9,7 +9,7 @@ import omnio
 
 def test_open_file_r():
     with omnio.open('tests/data/test_open_file_r.txt', 'r') as fd:
-        assert fd.read() == 'one\ntwo\nthree\n'
+        assert fd.read() == b'one\ntwo\nthree\n'
 
 
 def test_open_file_rtz():

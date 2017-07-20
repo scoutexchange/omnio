@@ -24,7 +24,7 @@ class GzipFileWrapper(gzip.GzipFile):
         self._fileobj.close()
 
 
-def open_(uri, mode='r', buffering=-1, encoding=None, newline=None,
+def open_(uri, mode='rb', buffering=-1, encoding=None, newline=None,
           closefd=None, opener=None):
 
     if not all(c in 'rwxatb+z' for c in mode):
@@ -66,7 +66,7 @@ def open_(uri, mode='r', buffering=-1, encoding=None, newline=None,
     if 'z' in mode:
         fd = GzipFileWrapper(fd, fd_mode)
 
-    if 'b' not in mode:
+    if 't' in mode:
         fd = io.TextIOWrapper(fd, encoding=encoding)
 
     return fd
