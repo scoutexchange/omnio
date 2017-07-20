@@ -40,7 +40,7 @@ def open_(uri, mode='r', buffering=-1, encoding=None, newline=None,
         raise ValueError(msg)
 
     if 'b' in mode and encoding is not None:
-        msg = "binary mode doesn't take an encodinqg argument"
+        msg = "binary mode doesn't take an encoding argument"
         raise ValueError(msg)
 
     # We want to support the standard python file open interface,
