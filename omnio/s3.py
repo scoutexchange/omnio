@@ -1,3 +1,4 @@
+import io
 import urllib
 
 import boto3
@@ -5,84 +6,22 @@ import boto3
 UPLOAD_PART_SIZE = 5 * 1024**2
 
 
-class S3Reader:
+class S3Reader(io.IOBase):
     def __init__(self, stream):
         self.stream = stream
-        self.line_iter = _iter_lines(self, chunk_size=512)
-        self.closed = False
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type_, value, traceback):
-        self.close()
-
-    def __iter__(self):
-        self._ensure_open()
-
-        return self
-
-    def __next__(self):
-        self._ensure_open()
-
-        return next(self.line_iter)
-
-    def _ensure_open(self):
+    def read(self, size=None):
         if self.closed:
             msg = 'I/O operation on a closed file'
             raise ValueError(msg)
 
-    def close(self):
-        self.closed = True
-
-    def flush(self):  # pragma: no cover
-        pass
+        return self.stream.read(size)
 
     def readable(self):  # pragma: no cover
         return True
 
-    def seekable(self):  # pragma: no cover
-        return False
 
-    def writable(self):  # pragma: no cover
-        return False
-
-    def read(self, size=None):
-        self._ensure_open()
-
-        data = self.stream.read(size)
-        return data
-
-    def seek(self, offset, whence=0):  # pragma: no cover
-        raise NotImplementedError()
-
-
-def _iter_lines(stream, chunk_size):
-    pending = None
-    while True:
-        chunk = stream.read(chunk_size)
-        if not chunk:
-            break
-
-        if pending is not None:
-            chunk = pending + chunk
-
-        lines = chunk.splitlines(keepends=True)
-
-        # The last item in the list is typically an unfinished line
-        # that needs to be completed with the next chunk. For
-        # expediency, we treat it as incomplete until the next
-        # chunk's splitlines() proves otherwise.
-        pending = lines.pop()
-
-        for line in lines:
-            yield line
-
-    if pending is not None:
-        yield pending
-
-
-class S3Writer:
+class S3Writer(io.IOBase):
     def __init__(self, s3, bucket, key):
         self.s3 = s3
         self.bucket = bucket
@@ -90,18 +29,6 @@ class S3Writer:
         self.buffer = bytearray()
         self.multipart = None
         self.parts = []
-        self.closed = False
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, type_, value, traceback):
-        return self.close()
-
-    def _ensure_open(self):
-        if self.closed:
-            msg = 'I/O operation on a closed file'
-            raise ValueError(msg)
 
     def _upload_part(self):  # pragma: no cover
         if not self.buffer:
@@ -121,7 +48,7 @@ class S3Writer:
         if self.closed:
             return
 
-        self.closed = True
+        super(S3Writer, self).close()
 
         if not self.multipart:
             self.s3.put_object(Bucket=self.bucket, Key=self.key,
@@ -137,23 +64,10 @@ class S3Writer:
                                           UploadId=self.multipart['UploadId'],
                                           MultipartUpload=part_info)
 
-    def flush(self):  # pragma: no cover
-        pass
-
-    def readable(self):  # pragma: no cover
-        return False
-
-    def seekable(self):  # pragma: no cover
-        return False
-
-    def writable(self):  # pragma: no cover
-        return True
-
-    def seek(self, offset, whence=None):  # pragma: no cover
-        raise NotImplementedError()
-
     def write(self, data):
-        self._ensure_open()
+        if self.closed:
+            msg = 'I/O operation on a closed file'
+            raise ValueError(msg)
 
         self.buffer.extend(data)
 
@@ -163,6 +77,9 @@ class S3Writer:
                         Bucket=self.bucket, Key=self.key)
 
             self._upload_part()
+
+    def writable(self):  # pragma: no cover
+        return True
 
 
 def open_(uri, mode):  # pragma: no cover
