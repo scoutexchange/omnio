@@ -6,12 +6,31 @@ import os
 import omnio
 
 
-def test_open_file_r():
-    with omnio.open('tests/data/test_open_file_r.txt', 'r') as fd:
-        assert fd.read() == b'one\ntwo\nthree\n'
+def test_rt_ascii():
+    path = 'tests/data/ascii.txt'
+    with omnio.open(path, 'rt', encoding='ascii') as fd:
+        data = fd.read()
+        assert type(data) is str
+        assert len(data) == 1392
 
 
-def test_open_file_rtz():
+def test_rt_iso8859():
+    path = 'tests/data/iso-8859-1.txt'
+    with omnio.open(path, 'rt', encoding='iso-8859-1') as fd:
+        data = fd.read()
+        assert type(data) is str
+        assert len(data) == 700
+
+
+def test_rt_utf8():
+    path = 'tests/data/utf-8.txt'
+    with omnio.open(path, 'rt', encoding='utf-8') as fd:
+        data = fd.read()
+        assert type(data) is str
+        assert len(data) == 874
+
+
+def test_rtz():
     with omnio.open('tests/data/flights-3m.csv.gz', 'rtz') as fd:
         reader = csv.reader(fd)
         headers = next(reader)
@@ -21,22 +40,22 @@ def test_open_file_rtz():
         assert len(data) == 231083  # number data rows
 
 
-def test_open_file_rbz():
+def test_rbz():
     with omnio.open('tests/data/flights-3m.csv.gz', 'rbz') as fd:
         data = fd.read()
         assert type(data) is bytes
         assert len(data) == 5535530  # uncompressed file size
 
 
-def test_open_file_rbj():
+def test_rbj():
     with omnio.open('tests/data/flights-3m.csv.bz2', 'rbj') as fd:
         data = fd.read()
         assert type(data) is bytes
         assert len(data) == 5535530  # uncompressed file size
 
 
-def test_open_file_w():
-    path = 'tests/data/test_open_file_w.txt'
+def test_w():
+    path = 'tests/data/w.txt'
     try:
         with omnio.open(path, 'wt') as fd:
             fd.write('one\ntwo\nthree\n')
@@ -49,8 +68,8 @@ def test_open_file_w():
         os.remove(path)
 
 
-def test_open_file_wbz():
-    path = 'tests/data/test_open_file_wbz.txt.gz'
+def test_wbz():
+    path = 'tests/data/wbz.txt.gz'
     data = os.urandom(1024)
     try:
         with omnio.open(path, 'wbz') as fd:
@@ -65,8 +84,8 @@ def test_open_file_wbz():
         os.remove(path)
 
 
-def test_open_file_wbj():
-    path = 'tests/data/test_open_file_wbj.txt.gz'
+def test_wbj():
+    path = 'tests/data/wbj.txt.bz2'
     data = os.urandom(1024)
     try:
         with omnio.open(path, 'wbj') as fd:
@@ -81,8 +100,8 @@ def test_open_file_wbj():
         os.remove(path)
 
 
-def test_open_file_wtz():
-    path = 'tests/data/test_open_file_wtz.txt.gz'
+def test_wtz():
+    path = 'tests/data/wtz.txt.gz'
     data = 'unicode string to be seamlessly compressed'
     try:
         with omnio.open(path, 'wtz') as fd:
