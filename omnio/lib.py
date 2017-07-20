@@ -59,7 +59,7 @@ def open_(uri, mode='r', buffering=-1, encoding=None, newline=None,
     scheme_open = _scheme_opens[parsed_uri.scheme]
 
     # Text encoding and gzip compression are handled with wrapper
-    # classes. Always do the underlying open in binary mode.
+    # classes. We always do the underlying open in binary mode.
     fd_mode = mode.replace('t', '').replace('b', '').replace('z', '')
     fd = scheme_open(uri, fd_mode + 'b')
 
