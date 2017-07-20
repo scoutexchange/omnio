@@ -1,7 +1,7 @@
 import requests
 
 
-class Reader:
+class HTTPReader:
     def __init__(self, resp):
         self.content_iter = resp.iter_content(chunk_size=512,
                                               decode_unicode=False)
@@ -97,7 +97,7 @@ def open_(uri, mode):  # pragma: no cover
 
     if 'r' in mode:
         resp = requests.get(uri, stream=True)
-        return Reader(resp)
+        return HTTPReader(resp)
 
     if 'w' in mode:
         raise NotImplementedError()

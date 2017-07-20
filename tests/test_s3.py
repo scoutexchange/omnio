@@ -12,7 +12,7 @@ def test_read_binary():
     data = os.urandom(1000)
     stream = io.BytesIO(data)
 
-    with omnio.s3.Reader(stream) as reader:
+    with omnio.s3.S3Reader(stream) as reader:
         assert reader.read() == data
 
 
@@ -20,7 +20,7 @@ def test_read_n_binary():
     data = b'one\ntwo\nthree'
     stream = io.BytesIO(data)
 
-    with omnio.s3.Reader(stream) as reader:
+    with omnio.s3.S3Reader(stream) as reader:
         assert reader.read(5) == data[:5]
 
 
@@ -28,7 +28,7 @@ def test_iter():
     data = b'one\ntwo\nthree four'
     stream = io.BytesIO(data)
 
-    with omnio.s3.Reader(stream) as reader:
+    with omnio.s3.S3Reader(stream) as reader:
         assert next(reader) == b'one\n'
         assert next(reader) == b'two\n'
         assert next(reader) == b'three four'
@@ -38,7 +38,7 @@ def test_iter_lines():
     lines = [b'0'*512 + b'\n', b'1'*666 + b'\n', b'2'*256]
     stream = io.BytesIO(b''.join(lines))
 
-    with omnio.s3.Reader(stream) as reader:
+    with omnio.s3.S3Reader(stream) as reader:
         for expected, data in zip(lines, reader):
             print(len(data), len(expected))
             assert data == expected
@@ -47,7 +47,7 @@ def test_iter_lines():
 def test_closed():
     data = b'one\ntwo\nthree four'
     stream = io.BytesIO(data)
-    f = omnio.s3.Reader(stream)
+    f = omnio.s3.S3Reader(stream)
     f.close()
 
     # none of these operations are allowed on a closed file
@@ -70,7 +70,7 @@ def test_write():
     with botocore.stub.Stubber(s3) as stubber:
         stubber.add_response('put_object', response, expected_params)
 
-        with omnio.s3.Writer(s3, 'my-bucket', 'my-key') as writer:
+        with omnio.s3.S3Writer(s3, 'my-bucket', 'my-key') as writer:
             writer.write(data)
 
         stubber.assert_no_pending_responses()
@@ -81,7 +81,7 @@ def test_write_closed():
     expected_params = {'Bucket': 'my-bucket', 'Key': 'my-key',
                        'Body': bytearray()}
     s3 = botocore.session.get_session().create_client('s3')
-    f = omnio.s3.Writer(s3, 'my-bucket', 'my-key')
+    f = omnio.s3.S3Writer(s3, 'my-bucket', 'my-key')
     with botocore.stub.Stubber(s3) as stubber:
         stubber.add_response('put_object', response, expected_params)
         f.close()

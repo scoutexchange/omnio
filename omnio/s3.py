@@ -5,7 +5,7 @@ import boto3
 UPLOAD_PART_SIZE = 5 * 1024**2
 
 
-class Reader:
+class S3Reader:
     def __init__(self, stream):
         self.stream = stream
         self.line_iter = _iter_lines(self, chunk_size=512)
@@ -82,7 +82,7 @@ def _iter_lines(stream, chunk_size):
         yield pending
 
 
-class Writer:
+class S3Writer:
     def __init__(self, s3, bucket, key):
         self.s3 = s3
         self.bucket = bucket
@@ -173,17 +173,18 @@ def open_(uri, mode):  # pragma: no cover
     s3 = boto3.client('s3')
 
     if 'x' in mode:
-        msg = "s3 scheme doesn't support 'x' mode"
+        msg = "s3 scheme doesn't support exclusive mode"
         raise ValueError(msg)
 
     if 'a' in mode:
-        raise NotImplementedError()
+        msg = "s3 scheme doesn't support append mode"
+        raise ValueError(msg)
 
     if 'r' in mode:
         resp = s3.get_object(Bucket=bucket, Key=key)
         stream = resp['Body']
 
-        return Reader(stream)
+        return S3Reader(stream)
 
     if 'w' in mode:
-        return Writer(s3, bucket, key)
+        return S3Writer(s3, bucket, key)
