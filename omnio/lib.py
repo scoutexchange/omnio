@@ -9,9 +9,9 @@ from omnio import http, path, s3
 _scheme_opens = {
     '': path._open,
     'file': path._open,
-    'http': http.open_,
-    'https': http.open_,
-    's3': s3.open_,
+    'http': http._open,
+    'https': http._open,
+    's3': s3._open,
 }
 
 

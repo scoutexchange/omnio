@@ -33,7 +33,7 @@ class HTTPReader(io.IOBase):
         return True
 
 
-def open_(uri, mode):  # pragma: no cover
+def _open(uri, mode):
 
     if any(c in mode for c in 'wax+'):  # pragma: no cover
         msg = "http scheme doesn't support '{}' mode".format(mode)

@@ -82,7 +82,7 @@ class S3Writer(io.IOBase):
         return True
 
 
-def open_(uri, mode):  # pragma: no cover
+def _open(uri, mode):  # pragma: no cover
     parsed_uri = urllib.parse.urlparse(uri)
     bucket = parsed_uri.netloc
     key = parsed_uri.path.lstrip('/')
