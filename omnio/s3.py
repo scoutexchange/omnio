@@ -89,12 +89,8 @@ def open_(uri, mode):  # pragma: no cover
 
     s3 = boto3.client('s3')
 
-    if 'x' in mode:
-        msg = "s3 scheme doesn't support exclusive mode"
-        raise ValueError(msg)
-
-    if 'a' in mode:
-        msg = "s3 scheme doesn't support append mode"
+    if any(c in mode for c in 'ax+'):
+        msg = "s3 scheme doesn't support '{}' mode".format(mode)
         raise ValueError(msg)
 
     if 'r' in mode:

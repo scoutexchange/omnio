@@ -35,13 +35,10 @@ class HTTPReader(io.IOBase):
 
 def open_(uri, mode):  # pragma: no cover
 
-    if 'x' in mode:
-        msg = "http scheme doesn't support 'x' mode"
-        raise ValueError(msg)
+    if any(c in mode for c in 'wax+'):  # pragma: no cover
+        msg = "http scheme doesn't support '{}' mode".format(mode)
+        raise NotImplementedError(msg)
 
     if 'r' in mode:
         resp = requests.get(uri, stream=True)
         return HTTPReader(resp)
-
-    if 'w' in mode:
-        raise NotImplementedError()
