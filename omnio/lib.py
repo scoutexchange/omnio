@@ -17,6 +17,81 @@ _scheme_opens = {
 
 def open_(uri, mode='rb', encoding=None, errors=None,
           newline=None):
+    """
+    Open URI and return a file-like stream.
+
+    uri -- URI or local path. Supported URI schemes are `file`,
+    `http`, and `s3`. Local paths may be specified by as ordinary path
+    strings.
+
+    mode -- Optional string that specifies the mode in which the
+    file is opened. It defaults to 'rb' which means open for reading
+    in binary mode. Supported mode characters are as follows:
+
+    ========= =======================================================
+    Character Meaning
+    --------- -------------------------------------------------------
+    'r'       open for reading (default)
+    'w'       open for writing, truncating the file first
+    'b'       binary mode (default)
+    't'       text mode
+    'z'       use gzip compression
+    'j'       use bzip2 compression
+    ========= =======================================================
+
+    These characters can be composed into valid modes. Binary mode is
+    always the default, so some mode specifications are equivalent.
+    The complete list of supported modes are as follows:
+
+    ============= ===================================================
+    Mode          Meaning
+    ------------- ---------------------------------------------------
+    'r', 'rb'     read bytes
+    'rt'          read and decode to unicode
+    'rz', 'rbz'   read, decompressing gzip to bytes
+    'rj', 'rbj'   read, decompressing bzip2 to bytes
+    'rtz'         read, decompress gzip to bytes, decode to unicode
+    'rtj'         read, decompress bzip2 to bytes, decode to unicode
+    'w', 'wb'     write bytes
+    'wt'          write unicode, encoding to bytes
+    'wz', 'wbz'   write bytes, compress with gzip
+    'wj', 'wbj'   write bytes, compress with bzip2
+    'wtz'         write unicode, encode to bytes, compress with gzip
+    'wtj'         write unicode, encode to bytes, compress with bzip2
+    ========= =======================================================
+
+    * Some keyword arguments may be applicable to only certain modes.
+    For example, `encoding` only applies to 't' (text) modes.
+
+    * Some schemes may not support some modes.  For example, the http
+    scheme currently does not support any 'w' (write) modes
+
+    Returns a file-like object whose type depends on the scheme and
+    the mode.
+
+    Usage examples:
+
+    # Read from an HTTTP URI to unicode
+    with omnio.open('http://example.com/example.txt', 'rt') as f:
+        for line in f:
+            print(line)
+
+
+    # Write and compress with gzip a megabyte of random data to s3
+    import os
+
+    data = os.urandom(1024**2)
+    with omnio.open('s3://my-bucket/my-key', 'wbz') as f:
+        f.write(data)
+
+
+    # Read a bzip2 compressed csv file into a list of data rows
+    import csv
+
+    with omnio.open('data/example_data.csv.bz2', 'rtj') as f:
+        reader = csv.reader(f)
+        data = list(reader)
+    """
 
     # Allow all standard mode characters, leaving the responsibility
     # of supporting them or not to the scheme open functions.

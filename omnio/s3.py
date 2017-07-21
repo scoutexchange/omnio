@@ -7,6 +7,7 @@ UPLOAD_PART_SIZE = 5 * 1024**2
 
 
 class S3Reader(io.IOBase):
+    """Reader for streaming content from Amazon S3"""
     def __init__(self, stream):
         self.stream = stream
 
@@ -22,6 +23,7 @@ class S3Reader(io.IOBase):
 
 
 class S3Writer(io.IOBase):
+    """Writer for streaming content to Amazon S3"""
     def __init__(self, s3, bucket, key):
         self.s3 = s3
         self.bucket = bucket

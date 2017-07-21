@@ -3,6 +3,7 @@ import requests
 
 
 class HTTPReader(io.IOBase):
+    """Reader for HTTP response content"""
     def __init__(self, resp):
         self.content_iter = resp.iter_content(chunk_size=512,
                                               decode_unicode=False)
