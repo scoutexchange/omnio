@@ -15,10 +15,12 @@ _scheme_opens = {
 }
 
 
-def open_(uri, mode='rb', buffering=-1, encoding=None, newline=None,
-          closefd=None, opener=None):
+def open_(uri, mode='rb', encoding=None, errors=None,
+          newline=None):
 
-    if not all(c in 'rwxatb+jz' for c in mode):
+    # Allow all standard mode characters, leaving the responsibility
+    # of supporting them or not to the scheme open functions.
+    if not all(c in 'rwxatb+Ujz' for c in mode):
         msg = 'invalid mode: {}'.format(mode)
         raise ValueError(msg)
 
@@ -34,21 +36,17 @@ def open_(uri, mode='rb', buffering=-1, encoding=None, newline=None,
         msg = "binary mode doesn't take an encoding argument"
         raise ValueError(msg)
 
+    if 'b' in mode and errors is not None:
+        msg = "binary mode doesn't take an errors argument"
+        raise ValueError(msg)
+
+    if 'b' in mode and newline is not None:
+        msg = "binary mode doesn't take an newline argument"
+        raise ValueError(msg)
+
     if 'j' in mode and 'z' in mode:
         msg = "can't use more than one compression argument"
         raise ValueError(msg)
-
-    # We want to support the standard python file open interface,
-    # but be clear that the following options aren't currently
-    # supported. Some of them could be in the future.
-    if buffering != -1:  # pragma: no cover
-        raise NotImplementedError('buffering kwarg')
-    if newline is not None:  # pragma: no cover
-        raise NotImplementedError('newline kwarg')
-    if closefd is not None:  # pragma: no cover
-        raise NotImplementedError('closefd kwarg')
-    if opener is not None:  # pragma: no cover
-        raise NotImplementedError('opener kwarg')
 
     parsed_uri = urllib.parse.urlparse(uri)
     scheme_open = _scheme_opens[parsed_uri.scheme]
@@ -68,7 +66,8 @@ def open_(uri, mode='rb', buffering=-1, encoding=None, newline=None,
         fd = GzipFileWrapper(fd, rw_mode)
 
     if 't' in mode:
-        fd = io.TextIOWrapper(fd, encoding=encoding)
+        fd = io.TextIOWrapper(fd, encoding=encoding, errors=errors,
+                              newline=newline)
 
     return fd
 
