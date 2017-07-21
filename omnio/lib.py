@@ -15,26 +15,6 @@ _scheme_opens = {
 }
 
 
-class GzipFileWrapper(gzip.GzipFile):
-    def __init__(self, fd, mode):
-        self._fileobj = fd
-        super(GzipFileWrapper, self).__init__(fileobj=fd, mode=mode)
-
-    def close(self):
-        super(GzipFileWrapper, self).close()
-        self._fileobj.close()
-
-
-class BZ2FileWrapper(bz2.BZ2File):
-    def __init__(self, fd, mode):
-        self._fileobj = fd
-        super(BZ2FileWrapper, self).__init__(fd, mode=mode)
-
-    def close(self):
-        super(BZ2FileWrapper, self).close()
-        self._fileobj.close()
-
-
 def open_(uri, mode='rb', buffering=-1, encoding=None, newline=None,
           closefd=None, opener=None):
 
@@ -91,3 +71,23 @@ def open_(uri, mode='rb', buffering=-1, encoding=None, newline=None,
         fd = io.TextIOWrapper(fd, encoding=encoding)
 
     return fd
+
+
+class BZ2FileWrapper(bz2.BZ2File):
+    def __init__(self, fd, mode):
+        self._fileobj = fd
+        super(BZ2FileWrapper, self).__init__(fd, mode=mode)
+
+    def close(self):
+        super(BZ2FileWrapper, self).close()
+        self._fileobj.close()
+
+
+class GzipFileWrapper(gzip.GzipFile):
+    def __init__(self, fd, mode):
+        self._fileobj = fd
+        super(GzipFileWrapper, self).__init__(fileobj=fd, mode=mode)
+
+    def close(self):
+        super(GzipFileWrapper, self).close()
+        self._fileobj.close()
