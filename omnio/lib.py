@@ -3,12 +3,12 @@ import gzip
 import io
 import urllib
 
-from omnio import file_, http, s3
+from omnio import http, path, s3
 
 
 _scheme_opens = {
-    '': file_.open_,
-    'file': file_.open_,
+    '': path._open,
+    'file': path._open,
     'http': http.open_,
     'https': http.open_,
     's3': s3.open_,
