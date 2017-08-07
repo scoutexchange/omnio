@@ -5,7 +5,7 @@
 This library provides the `omnio.open()` function with an interface very
 similar to that of the built in Python `open` function.  The difference is
 that while Python's `open` operates only on local filesystem paths, `omnio`
-accepts URIs and returns an object that can be treated as a file.
+accepts URIs as well.
 
 In addition, it supports compression and decompression of streams with gzip
 or bz2.
