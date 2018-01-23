@@ -59,7 +59,7 @@ def test_w():
     try:
         with omnio.open(path, 'wt') as fd:
             fd.write('one\ntwo\nthree\n')
-    except:
+    except Exception:
         raise
     else:
         with open(path, 'r') as fd:
@@ -74,7 +74,7 @@ def test_wbz():
     try:
         with omnio.open(path, 'wbz') as fd:
             fd.write(data)
-    except:
+    except Exception:
         raise
     else:
         with open(path, 'rb') as fd:
@@ -90,7 +90,7 @@ def test_wbj():
     try:
         with omnio.open(path, 'wbj') as fd:
             fd.write(data)
-    except:
+    except Exception:
         raise
     else:
         with open(path, 'rb') as fd:
@@ -106,7 +106,7 @@ def test_wtz():
     try:
         with omnio.open(path, 'wtz') as fd:
             fd.write(data)
-    except:
+    except Exception:
         raise
     else:
         with open(path, 'rb') as fd:
