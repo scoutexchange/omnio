@@ -42,7 +42,7 @@ The 'z' and 'j' flags also apply to 'r' modes to decompress the stream.
 
     with omnio.open('example.txt.gz', 'rtz') as f:
         for line in f:
-            print line
+            print(line)
 
 You can stream NASA's Meteorite Landings CSV dataset into memory by supplying
 the `omnio`'s file-like object to Python's standard library `csv` module.
