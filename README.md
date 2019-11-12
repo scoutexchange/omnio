@@ -26,42 +26,42 @@ or bz2.
 
 Read a local binary file:
 
-    with omnio.open('example.bin', 'r') as f:
-        data = f.read()
+    >>> with omnio.open('example.bin', 'r') as f:
+    >>>     data = f.read()
 
 Read a local text file:
 
-    with omnio.open('example.txt', 'rt') as f:
-        text = f.read()
+    >>> with omnio.open('example.txt', 'rt') as f:
+    >>>     text = f.read()
 
 Read a text file from the web:
 
-    with omnio.open('https://example.com/example.txt', 'rt') as f:
-        text = f.read()
+    >>> with omnio.open('https://example.com/example.txt', 'rt') as f:
+    >>>     text = f.read()
 
 Read a gzipped text file from the web, uncompressing on the fly:
 
-    with omnio.open('https://example.com/example.txt.gz', 'rtz') as f:
-        text = f.read()
+    >>> with omnio.open('https://example.com/example.txt.gz', 'rtz') as f:
+    >>>     text = f.read()
 
 Read a text file from s3:
 
-    with omnio.open('s3://my-bucket/my-key', 'rt') as f:
-        text = f.read()
+    >>> with omnio.open('s3://my-bucket/my-key', 'rt') as f:
+    >>>     text = f.read()
 
 Write a megabyte of random data to s3, compressing with bzip2:
 
-    import os
-    data = os.urandom(1024**2)
-    with omnio.open('s3://my-bucket/my-key', 'wbj') as f:
-        f.write(data)
+    >>> import os
+    >>> data = os.urandom(1024**2)
+    >>> with omnio.open('s3://my-bucket/my-key', 'wbj') as f:
+    >>>     f.write(data)
 
 Read a bzip2 compressed csv file into a list of data rows:
 
-    import csv
-    with omnio.open('data/example_data.csv.bz2', 'rtj') as f:
-        reader = csv.reader(f)
-        data = list(reader)
+    >>> import csv
+    >>> with omnio.open('data/example_data.csv.bz2', 'rtj') as f:
+    >>>     reader = csv.reader(f)
+    >>>     data = list(reader)
 
 
 ## API
