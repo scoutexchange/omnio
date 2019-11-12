@@ -1,9 +1,30 @@
 [tool.poetry]
 name = "omnio"
-version = "1.0.0"
+version = "1.0.1"
 description = "Python 3 library for opening URIs as streaming file-like objects"
 authors = ["Bob Green <rgreen@goscoutgo.com>"]
+readme = "README.md"
+repository = "https://github.com/scoutexchange/omnio"
 license = "MIT"
+keywords = ["retry", "backoff", "decorators"]
+classifiers = ['Development Status :: 5 - Production/Stable',
+               'Intended Audience :: Developers',
+               'Programming Language :: Python',
+               'License :: OSI Approved :: MIT License',
+               'Natural Language :: English',
+               'Operating System :: OS Independent',
+               'Programming Language :: Python',
+               'Programming Language :: Python :: 3',
+               'Programming Language :: Python :: 3.6',
+               'Programming Language :: Python :: 3.7',
+               'Topic :: Internet :: WWW/HTTP',
+               'Topic :: Software Development :: Libraries :: Python Modules',
+               'Topic :: Utilities']
+packages = [
+    { include = "omnio" },
+    { include = "README.md" },
+    { include = "LICENSE" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"
