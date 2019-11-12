@@ -3,11 +3,12 @@ import urllib
 
 import boto3
 
-UPLOAD_PART_SIZE = 5 * 1024**2
+UPLOAD_PART_SIZE = 5 * 1024 ** 2
 
 
 class S3Reader(io.IOBase):
     """Reader for streaming content from Amazon S3"""
+
     def __init__(self, stream):
         self.stream = stream
 
@@ -24,6 +25,7 @@ class S3Reader(io.IOBase):
 
 class S3Writer(io.IOBase):
     """Writer for streaming content to Amazon S3"""
+
     def __init__(self, s3, bucket, key):
         self.s3 = s3
         self.bucket = bucket
@@ -38,10 +40,13 @@ class S3Writer(io.IOBase):
 
         data = self.buffer[:UPLOAD_PART_SIZE]
 
-        part = self.s3.upload_part(Bucket=self.bucket, Key=self.key,
-                                   PartNumber=len(self.parts)+1,
-                                   UploadId=self.multipart['UploadId'],
-                                   Body=data)
+        part = self.s3.upload_part(
+            Bucket=self.bucket,
+            Key=self.key,
+            PartNumber=len(self.parts) + 1,
+            UploadId=self.multipart['UploadId'],
+            Body=data,
+        )
         self.parts.append(part)
 
         self.buffer = self.buffer[UPLOAD_PART_SIZE:]
@@ -53,18 +58,22 @@ class S3Writer(io.IOBase):
         super(S3Writer, self).close()
 
         if not self.multipart:
-            self.s3.put_object(Bucket=self.bucket, Key=self.key,
-                               Body=self.buffer)
+            self.s3.put_object(Bucket=self.bucket, Key=self.key, Body=self.buffer)
             return
 
         self._upload_part()
         part_info = {
-            'Parts': [{'PartNumber': i+1, 'ETag': part['ETag']}
-                      for i, part in enumerate(self.parts)]
+            'Parts': [
+                {'PartNumber': i + 1, 'ETag': part['ETag']}
+                for i, part in enumerate(self.parts)
+            ]
         }
-        self.s3.complete_multipart_upload(Bucket=self.bucket, Key=self.key,
-                                          UploadId=self.multipart['UploadId'],
-                                          MultipartUpload=part_info)
+        self.s3.complete_multipart_upload(
+            Bucket=self.bucket,
+            Key=self.key,
+            UploadId=self.multipart['UploadId'],
+            MultipartUpload=part_info,
+        )
 
     def write(self, data):
         if self.closed:
@@ -76,7 +85,8 @@ class S3Writer(io.IOBase):
         if len(self.buffer) > UPLOAD_PART_SIZE:  # pragma: no cover
             if self.multipart is None:
                 self.multipart = self.s3.create_multipart_upload(
-                        Bucket=self.bucket, Key=self.key)
+                    Bucket=self.bucket, Key=self.key
+                )
 
             self._upload_part()
 

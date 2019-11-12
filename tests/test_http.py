@@ -16,8 +16,13 @@ def _load_test_data(encoding):
 def test_open_rt_ascii():
     uri = 'http://example.com/example'
     data = _load_test_data('ascii')
-    responses.add(responses.GET, uri, body=data, status=200,
-                  content_type='text/plain; charset=ASCII')
+    responses.add(
+        responses.GET,
+        uri,
+        body=data,
+        status=200,
+        content_type='text/plain; charset=ASCII',
+    )
 
     with omnio.open(uri, 'rt') as infile:
         assert infile.read() == data.decode('ascii')
@@ -27,8 +32,13 @@ def test_open_rt_ascii():
 def test_open_rt_iso_8859_1():
     uri = 'http://example.com/example'
     data = _load_test_data('iso-8859-1')
-    responses.add(responses.GET, uri, body=data, status=200,
-                  content_type='text/plain; charset=ISO-8859-1')
+    responses.add(
+        responses.GET,
+        uri,
+        body=data,
+        status=200,
+        content_type='text/plain; charset=ISO-8859-1',
+    )
 
     with omnio.open(uri, 'rt') as infile:
         assert infile.read() == data.decode('iso-8859-1')
@@ -38,8 +48,13 @@ def test_open_rt_iso_8859_1():
 def test_open_rt_utf8():
     uri = 'http://example.com/example'
     data = _load_test_data('utf-8')
-    responses.add(responses.GET, uri, body=data, status=200,
-                  content_type='text/plain; charset=UTF-8')
+    responses.add(
+        responses.GET,
+        uri,
+        body=data,
+        status=200,
+        content_type='text/plain; charset=UTF-8',
+    )
 
     with omnio.open(uri, 'rt') as infile:
         assert infile.read() == data.decode('utf-8')
@@ -63,11 +78,17 @@ def test_read_chunk():
 def test_iter():
     uri = 'http://example.com/example'
     data = _load_test_data('utf-8')
-    responses.add(responses.GET, uri, body=data, status=200,
-                  content_type='text/plain; charset=UTF-8')
+    responses.add(
+        responses.GET,
+        uri,
+        body=data,
+        status=200,
+        content_type='text/plain; charset=UTF-8',
+    )
 
-    expect_first = 'Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν, ὦ ἄνδρες ' \
-        '᾿Αθηναῖοι,\n'.encode('utf-8')
+    expect_first = (
+        'Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν, ὦ ἄνδρες ' '᾿Αθηναῖοι,\n'.encode('utf-8')
+    )
     expect_last = 'τελευτῆς ὁντινοῦν ποιεῖσθαι λόγον.'.encode('utf-8')
 
     with omnio.open(uri, 'rb') as infile:

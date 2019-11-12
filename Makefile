@@ -9,10 +9,10 @@ all:
 	@echo 'test             run the unit tests'
 
 black:
-	@black --line-length 79 --skip-string-normalization omnio tests
+	@black --skip-string-normalization omnio tests
 
 black-check:
-	@black --line-length 79 --skip-string-normalization --check omnio tests || exit 1
+	@black --skip-string-normalization --check omnio tests || exit 1
 
 check: clean black-check flake8 test
 	@coverage report |grep ^TOTAL |grep 100% >/dev/null || { echo 'Unit test coverage is incomplete.'; exit 1; }
@@ -23,7 +23,7 @@ clean:
 	@rm -rf build dist .coverage MANIFEST
 
 flake8:
-	@flake8 omnio tests
+	@flake8 --max-line-length 88 omnio tests
 
 test: clean
 	@PYTHONPATH=. py.test --cov omnio tests/test_*.py

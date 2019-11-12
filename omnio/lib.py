@@ -15,8 +15,7 @@ _scheme_opens = {
 }
 
 
-def open_(uri, mode='rb', encoding=None, errors=None,
-          newline=None):
+def open_(uri, mode='rb', encoding=None, errors=None, newline=None):
     """
     Open URI and return a file-like stream.
 
@@ -141,8 +140,7 @@ def open_(uri, mode='rb', encoding=None, errors=None,
         fd = GzipFileWrapper(fd, rw_mode)
 
     if 't' in mode:
-        fd = io.TextIOWrapper(fd, encoding=encoding, errors=errors,
-                              newline=newline)
+        fd = io.TextIOWrapper(fd, encoding=encoding, errors=errors, newline=newline)
 
     return fd
 

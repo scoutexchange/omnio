@@ -34,8 +34,7 @@ def test_rtz():
     with omnio.open('tests/data/flights-3m.csv.gz', 'rtz') as fd:
         reader = csv.reader(fd)
         headers = next(reader)
-        assert headers == \
-            ['date', 'delay', 'distance', 'origin', 'destination']
+        assert headers == ['date', 'delay', 'distance', 'origin', 'destination']
         data = list(reader)
         assert len(data) == 231083  # number data rows
 
