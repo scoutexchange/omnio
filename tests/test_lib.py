@@ -32,3 +32,12 @@ def test_invalid_combination():
     # only one compression type allowed
     with pytest.raises(ValueError):
         omnio.open('', 'rjz')
+
+
+def test_default_config():
+    config = omnio.default_config()
+
+    for scheme in ["file", "http", "s3"]:
+        assert isinstance(config[scheme], dict)
+
+    omnio.open("tests/data/ascii.txt", 'rt', config=config)

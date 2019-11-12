@@ -123,3 +123,25 @@ example, `encoding` only applies to 't' (text) modes._
 
 _Some schemes may not support some modes.  For example, the http
 scheme currently does not support any 'w' (write) modes._
+
+
+## Configuration
+
+The `omnio.open` function accepts an optional `config` parameter. This allows
+for specifying scheme-specific configuration.
+
+The `default_config()` method returns a config dictionary with all supported
+keys defined along with their default values.
+
+    >>> import omnio
+    >>> omnio.default_config()
+    {'file': {}, 'http': {'content_iter_chunk_size': 512}, 's3': {'upload_part_size': 5242880, 'boto_client_config_args': [], 'boto_client_config_kwargs': {}}}
+
+To specify alternate values for these parameters, instantiate a default
+config, update the dict with the desired values and pass it as a keyword arg
+to the `omnio.open()` function.
+
+    >>> config = omnio.default_config()
+    >>> config["s3"]["boto_client_config_kwargs"] = {"read_timeout": 600}
+    >>> with omnio.open("s3://my-bucket/my-key", "rt", config=config) as fd:
+        fd.read()

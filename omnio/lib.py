@@ -15,7 +15,19 @@ _scheme_opens = {
 }
 
 
-def open_(uri, mode='rb', encoding=None, errors=None, newline=None):
+def default_config():
+    return {
+        "file": {},
+        "http": {"iter_content_chunk_size": 512},
+        "s3": {
+            "upload_part_size": 5 * 1024 ** 2,
+            "boto_client_config_args": [],
+            "boto_client_config_kwargs": {},
+        },
+    }
+
+
+def open_(uri, mode='rb', encoding=None, errors=None, newline=None, config=None):
     """
     Open URI and return a file-like stream.
 
@@ -131,7 +143,10 @@ def open_(uri, mode='rb', encoding=None, errors=None, newline=None):
     for s in 'tbjz':
         rw_mode = rw_mode.replace(s, '')
 
-    fd = scheme_open(uri, rw_mode + 'b')
+    if config is None:
+        config = default_config()
+
+    fd = scheme_open(uri, rw_mode + 'b', config)
 
     if 'j' in mode:
         fd = BZ2FileWrapper(fd, rw_mode)
