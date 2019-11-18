@@ -1,8 +1,9 @@
 import io
 import os
 
-import botocore.stub
+import botocore.exceptions
 import botocore.response
+import botocore.stub
 import pytest
 
 import omnio
@@ -22,6 +23,31 @@ def test_read_n_binary():
 
     with omnio.s3.S3Reader(stream) as reader:
         assert reader.read(5) == data[:5]
+
+
+def test_read_timeout_error():
+    class Stream(io.BytesIO):
+        def read(self, *args, **kwargs):
+            raise botocore.exceptions.ReadTimeoutError(endpoint_url="test/")
+
+    with omnio.s3.S3Reader(Stream()) as reader:
+        with pytest.raises(TimeoutError):
+            reader.read()
+
+
+def test_read_connection_error(monkeypatch):
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def get_object(self, Bucket=None, Key=None):
+            raise botocore.exceptions.EndpointConnectionError(endpoint_url="test/")
+
+    monkeypatch.setattr("boto3.client", Client)
+
+    with pytest.raises(ConnectionError):
+        with omnio.open("s3://bucket/key"):
+            pass
 
 
 def test_iter():

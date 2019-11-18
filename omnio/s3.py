@@ -3,6 +3,7 @@ import urllib
 
 import boto3
 import botocore
+import botocore.exceptions
 
 
 class S3Reader(io.IOBase):
@@ -16,7 +17,10 @@ class S3Reader(io.IOBase):
             msg = 'I/O operation on a closed file'
             raise ValueError(msg)
 
-        return self.stream.read(size)
+        try:
+            return self.stream.read(size)
+        except botocore.exceptions.ReadTimeoutError as e:
+            raise TimeoutError(e)
 
     def readable(self):  # pragma: no cover
         return True
@@ -110,9 +114,12 @@ def _open(uri, mode, config):  # pragma: no cover
         raise ValueError(msg)
 
     if 'r' in mode:
-        resp = s3.get_object(Bucket=bucket, Key=key)
-        stream = resp['Body']
+        try:
+            resp = s3.get_object(Bucket=bucket, Key=key)
+        except botocore.exceptions.EndpointConnectionError as e:
+            raise ConnectionError(e)
 
+        stream = resp['Body']
         return S3Reader(stream)
 
     if 'w' in mode:
