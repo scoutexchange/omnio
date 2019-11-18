@@ -6,7 +6,6 @@ authors = ["Bob Green <rgreen@goscoutgo.com>"]
 readme = "README.md"
 repository = "https://github.com/scoutexchange/omnio"
 license = "MIT"
-keywords = ["retry", "backoff", "decorators"]
 classifiers = ['Development Status :: 5 - Production/Stable',
                'Intended Audience :: Developers',
                'Programming Language :: Python',
