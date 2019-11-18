@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "omnio"
-version = "1.0.1"
+version = "1.1.0"
 description = "Python 3 library for opening URIs as streaming file-like objects"
 authors = ["Bob Green <rgreen@goscoutgo.com>"]
 readme = "README.md"
