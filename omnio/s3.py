@@ -116,6 +116,10 @@ def _open(uri, mode, config):  # pragma: no cover
     if 'r' in mode:
         try:
             resp = s3.get_object(Bucket=bucket, Key=key)
+        except botocore.errorfactory.ClientError as client_error:
+            if client_error.response['Error']['Code'] == 'NoSuchKey':
+                raise FileNotFoundError(client_error)
+            raise
         except botocore.exceptions.EndpointConnectionError as e:
             raise ConnectionError(e)
 
