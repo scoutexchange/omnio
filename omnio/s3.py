@@ -1,3 +1,4 @@
+import fnmatch
 import io
 import urllib
 
@@ -137,3 +138,32 @@ def _open(uri, mode, *, config=None):  # pragma: no cover
     if 'w' in mode:
         upload_part_size = config["s3"]["upload_part_size"]
         return S3Writer(s3, bucket, key, upload_part_size)
+
+
+def _iglob(uri, *, recursive=False, config=None):  # pragma: no cover
+    parsed_uri = urllib.parse.urlparse(uri)
+    bucket_name = parsed_uri.netloc
+    pattern = parsed_uri.path.lstrip('/')
+
+    # anything before the first wildcard character can be
+    # treated as the Prefix for the s3 objects filter
+    idx = min((pattern.index(c) for c in "*?[" if c in pattern), default=len(pattern))
+    prefix = pattern[:idx]
+
+    args = config["s3"]["boto_client_config_args"]
+    kwargs = config["s3"]["boto_client_config_kwargs"]
+    boto_config = botocore.client.Config(*args, **kwargs)
+
+    s3 = boto3.resource('s3', config=boto_config)
+    bucket = s3.Bucket(bucket_name)
+
+    for obj in bucket.objects.filter(Prefix=prefix):
+        suffix = obj.key.lstrip(prefix)
+
+        if recursive is False and "/" in suffix:
+            continue
+
+        if not fnmatch.fnmatch(obj.key, pattern):
+            continue
+
+        yield f"{parsed_uri.scheme}://{bucket_name}/{obj.key}"

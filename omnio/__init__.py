@@ -19,7 +19,7 @@ be expanded to support additional schemes in the future.
 from omnio.lib import open_ as open
 from omnio.config import default_config
 
-__all__ = ['open', 'default_config']
+__all__ = ['open', 'glob', 'default_config']
 open.__name__ = 'open'
 
 __version__ = '1.2.2'
