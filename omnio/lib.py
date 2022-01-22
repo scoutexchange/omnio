@@ -3,7 +3,8 @@ import gzip
 import io
 import urllib
 
-from omnio import http, path, s3
+from . import http, path, s3
+from .config import default_config
 
 
 _scheme_opens = {
@@ -13,18 +14,6 @@ _scheme_opens = {
     'https': http._open,
     's3': s3._open,
 }
-
-
-def default_config():
-    return {
-        "file": {},
-        "http": {"iter_content_chunk_size": 512},
-        "s3": {
-            "upload_part_size": 5 * 1024 ** 2,
-            "boto_client_config_args": [],
-            "boto_client_config_kwargs": {},
-        },
-    }
 
 
 def open_(uri, mode='rb', encoding=None, errors=None, newline=None, config=None):

@@ -16,7 +16,8 @@ be expanded to support additional schemes in the future.
 # is designed to be semantically referenced as omnio.open().  So
 # here we rejigger to make that work and look natural in the module
 # help.
-from omnio.lib import open_ as open, default_config
+from omnio.lib import open_ as open
+from omnio.config import default_config
 
 __all__ = ['open', 'default_config']
 open.__name__ = 'open'
