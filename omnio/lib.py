@@ -135,7 +135,7 @@ def open_(uri, mode='rb', encoding=None, errors=None, newline=None, config=None)
     if config is None:
         config = default_config()
 
-    fd = scheme_open(uri, rw_mode + 'b', config)
+    fd = scheme_open(uri, rw_mode + 'b', config=config)
 
     if 'j' in mode:
         fd = BZ2FileWrapper(fd, rw_mode)
