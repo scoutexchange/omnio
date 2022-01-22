@@ -2,8 +2,10 @@ import bz2
 import csv
 import gzip
 import os
+import types
 
 import omnio
+from omnio import glob
 
 
 def test_rt_ascii():
@@ -113,3 +115,19 @@ def test_wtz():
                 assert gz.read() == data
     finally:
         os.remove(path)
+
+
+def test_glob():
+    uris = glob.glob("tests/test_*.py")
+    assert isinstance(uris, list)
+    assert uris
+    assert all(u.startswith("tests/test_") for u in uris)
+    assert all(u.endswith(".py") for u in uris)
+
+
+def test_iglob():
+    uris = glob.iglob("tests/test_*.py")
+    assert isinstance(uris, types.GeneratorType)
+    uris = list(uris)
+    assert all(u.startswith("tests/test_") for u in uris)
+    assert all(u.endswith(".py") for u in uris)
