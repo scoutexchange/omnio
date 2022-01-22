@@ -66,10 +66,12 @@ Read a bzip2 compressed csv file into a list of data rows:
 
 ## API
 
-The omnio API consists of a single function intended to be referenced as
-`omnio.open()`. This function API is designed to mimic Python 3's built-in
-`open()` as much as possible, and should normally be able to be used as a
-drop-in replacement.
+### omnio.open()
+
+The top-level API provides of a single function intended to be
+referenced as `omnio.open()`. This function API is designed to mimic
+Python 3's built-in `open()` as much as possible, and should normally
+be able to be used as a drop-in replacement.
 
 _Signature:_
 
@@ -125,10 +127,21 @@ _Some schemes may not support some modes.  For example, the http
 scheme currently does not support any 'w' (write) modes._
 
 
+### omnio.glob
+
+The `glob` submodule is intended to be a drop-in replacement for the
+standard library `glob` module. It provides the functions `escape()`,
+`glob()`, and `iglob()` with the signature of each matching that of
+the original.
+
+The difference is that `glob()` and `iglob()` optionally accept URIs.
+Currently, local paths, `file://`, and `s3://` URIs are supported.
+
+
 ## Configuration
 
-The `omnio.open` function accepts an optional `config` parameter. This allows
-for specifying scheme-specific configuration.
+The `omnio.open` function accepts an optional `config` parameter. This
+allows for specifying scheme-specific configuration.
 
 The `default_config()` method returns a config dictionary with all supported
 keys defined along with their default values.
