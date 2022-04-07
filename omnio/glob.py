@@ -1,7 +1,16 @@
 """
-Drop in replacement module for python's filename globbing utility
+Drop in replacement module for python's stdlib `glob` module which supports
+URIs in addition to local paths.
 
 
+Example usage:
+
+    from omnio import glob
+
+    for uri in glob.iglob("s3://my-bucket/*.txt.gz"):
+        with fd omnio.open(uri, "rtz") as fd:
+            for line in fd.readlines():
+                print(line)
 """
 
 import urllib
