@@ -1,6 +1,6 @@
 # omnio
 
-*Python 3 library for opening URIs as streaming file-like objects*
+*Python library for opening URIs as streaming file-like objects*
 
 This library provides the `omnio.open()` function with an interface very
 similar to that of the built in Python `open` function.  The difference is
