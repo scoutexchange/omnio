@@ -4,6 +4,8 @@ import os
 import botocore.exceptions
 import botocore.response
 import botocore.stub
+import boto3
+import moto
 import pytest
 
 import omnio
@@ -138,3 +140,80 @@ def test_write_not_bytes():
                     writer.write(data)
 
         stubber.assert_no_pending_responses()
+
+
+@moto.mock_s3
+def test_iglob():
+    bucket = "mock-bucket"
+    s3 = boto3.resource('s3')
+    s3.create_bucket(Bucket=bucket)
+
+    for fn in [
+        "one.txt.gz",
+        "two.txt.gz",
+        "three.txt.gz",
+        "prefix/four.txt.gz",
+        "ascii.txt",
+    ]:
+        obj = s3.Object(bucket, fn)
+        with open(f"tests/data/{fn}", "rb") as fd:
+            content = fd.read()
+            obj.put(Body=content)
+
+    lines = set()
+    for uri in omnio.glob.iglob(f"s3://{bucket}/*.txt.gz"):
+        with omnio.open(uri, "rtz") as fd:
+            for line in fd:
+                lines.add(line.rstrip("\n"))
+
+    assert lines == {
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+    }
+
+
+@moto.mock_s3
+def test_iglob_recursive():
+    bucket = "mock-bucket"
+    s3 = boto3.resource('s3')
+    s3.create_bucket(Bucket=bucket)
+
+    for fn in [
+        "one.txt.gz",
+        "two.txt.gz",
+        "three.txt.gz",
+        "prefix/four.txt.gz",
+        "ascii.txt",
+    ]:
+        obj = s3.Object(bucket, fn)
+        with open(f"tests/data/{fn}", "rb") as fd:
+            content = fd.read()
+            obj.put(Body=content)
+
+    lines = set()
+    for uri in omnio.glob.iglob(f"s3://{bucket}/*.txt.gz", recursive=True):
+        with omnio.open(uri, "rtz") as fd:
+            for line in fd:
+                lines.add(line.rstrip("\n"))
+
+    assert lines == {
+        "one",
+        "two",
+        "three",
+        "four",
+        "five",
+        "six",
+        "seven",
+        "eight",
+        "nine",
+        "ten",
+        "eleven",
+        "twelve",
+    }

@@ -140,7 +140,7 @@ def _open(uri, mode, *, config=None):  # pragma: no cover
         return S3Writer(s3, bucket, key, upload_part_size)
 
 
-def _iglob(uri, *, recursive=False, config=None):  # pragma: no cover
+def _iglob(uri, *, recursive=False, config=None):
     parsed_uri = urllib.parse.urlparse(uri)
     bucket_name = parsed_uri.netloc
     pattern = parsed_uri.path.lstrip('/')
