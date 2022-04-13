@@ -85,6 +85,14 @@ class S3Writer(io.IOBase):
             msg = 'I/O operation on a closed file'
             raise ValueError(msg)
 
+        # ensure that data is bytes-like
+        try:
+            data.decode()
+        except (UnicodeDecodeError, AttributeError):
+            raise TypeError(
+                f"a bytes-like object is required, not '{type(data).__name__}'"
+            ) from None
+
         self.buffer.extend(data)
 
         if len(self.buffer) > self.upload_part_size:  # pragma: no cover

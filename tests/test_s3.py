@@ -112,3 +112,17 @@ def test_write_closed():
 
     with pytest.raises(ValueError):
         f.write(b'')
+
+
+def test_write_not_bytes():
+    s3 = botocore.session.get_session().create_client('s3')
+    with botocore.stub.Stubber(s3) as stubber:
+
+        # various data that isn't bytes-like
+        for data in ["foo", 42, []]:
+            stubber.add_response('put_object', {})
+            with pytest.raises(TypeError):
+                with omnio.s3.S3Writer(s3, 'my-bucket', 'my-key', 512) as writer:
+                    writer.write(data)
+
+        stubber.assert_no_pending_responses()
