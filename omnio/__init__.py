@@ -21,4 +21,4 @@ from omnio.lib import open_ as open, default_config
 __all__ = ['open', 'default_config']
 open.__name__ = 'open'
 
-__version__ = '1.2.1'
+__version__ = '1.2.2'
