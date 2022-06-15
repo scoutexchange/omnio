@@ -87,8 +87,8 @@ class S3Writer(io.IOBase):
 
         # ensure that data is bytes-like
         try:
-            data.decode()
-        except (UnicodeDecodeError, AttributeError):
+            memoryview(data)
+        except TypeError:
             raise TypeError(
                 f"a bytes-like object is required, not '{type(data).__name__}'"
             ) from None

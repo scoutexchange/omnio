@@ -114,6 +114,18 @@ def test_write_closed():
         f.write(b'')
 
 
+def test_write_not_utf8():
+    s3 = botocore.session.get_session().create_client('s3')
+    with botocore.stub.Stubber(s3) as stubber:
+
+        data = b'\037\213'
+        stubber.add_response('put_object', {})
+        with omnio.s3.S3Writer(s3, 'my-bucket', 'my-key', 512) as writer:
+            writer.write(data)
+
+        stubber.assert_no_pending_responses()
+
+
 def test_write_not_bytes():
     s3 = botocore.session.get_session().create_client('s3')
     with botocore.stub.Stubber(s3) as stubber:
