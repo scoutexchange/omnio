@@ -18,6 +18,7 @@ be expanded to support additional schemes in the future.
 # help.
 from omnio.lib import open_ as open
 from omnio.config import default_config
+from . import glob
 
 __all__ = ['open', 'glob', 'default_config']
 open.__name__ = 'open'
